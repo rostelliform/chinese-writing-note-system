@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coordinate System</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            position: relative;
+            background-color: white;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+            background-size: 5% 5%;
+            background-attachment: fixed;
+        }
+        .axis {
+            position: absolute;
+            background-color: black;
+        }
+        .x-axis {
+            top: 50%;
+            left: -50%;
+            width: 200%;
+            height: 2px;
+        }
+        .y-axis {
+            left: 50%;
+            top: -50%;
+            width: 2px;
+            height: 200%;
+        }
+        .grid-line {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .grid-x {
+            width: 100%;
+            height: 1px;
+        }
+        .grid-y {
+            height: 100%;
+            width: 1px;
+        }
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: center;
+            left: 0;
+            top: 0;
+        }
+        .zoom-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+        }
+        #sidebar {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background-color: #f0f0f0;
+            border-left: 2px solid #ccc;
+            z-index: 20;
+            transition: right 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        #sidebar.open {
+            right: 0;
+        }
+        #toggle-sidebar {
+            position: fixed;
+            right: 10px;
+            top: 100px;
+            z-index: 15;
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="zoom-buttons">
+        <button onclick="zoomIn()">Zoom In</button>
+        <button onclick="zoomOut()">Zoom Out</button>
+        <button onclick="resetZoom()">Reset</button>
+    </div>
+    <button id="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    <div id="sidebar">
+        <h2>Notes</h2>
+        <textarea id="notes-input" placeholder="Enter your notes here..." style="position: absolute; bottom: 10%; width: 90%; height: 15px; padding: 10px; font-family: Arial, sans-serif; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+    </div>
+    <div id="container">
+        <div class="axis x-axis"></div>
+        <div class="axis y-axis"></div>
+    </div>
+    <script>
+        let scale = 1;
+        const container = document.getElementById('container');
+        const minScale = 0.5;
+        const maxScale = 5;
+        
+        function zoomIn() {
+            scale = Math.min(scale * 1.2, maxScale);
+            container.style.transform = 'scale(' + scale + ')';
+            updateAxisThickness();
+        }
+        
+        function zoomOut() {
+            scale = Math.max(scale / 1.2, minScale);
+            container.style.transform = 'scale(' + scale + ')';
+            updateAxisThickness();
+        }
+        
+        function resetZoom() {
+            scale = 1;
+            container.style.transform = 'scale(1)';
+            updateAxisThickness();
+        }
+        
+        function updateAxisThickness() {
+            const thickness = 2/scale // Keep thickness proportional to the zoom level
+            document.querySelector('.x-axis').style.height = thickness + 'px';
+            document.querySelector('.y-axis').style.width = thickness + 'px';
+            document.body.style.backgroundSize = (5 / scale) + '% ' + (5 / scale) + '%';
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        
+        // Scroll to zoom
+        window.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        }, { passive: false });
+    </script>
+    
+</body>
+</html>
